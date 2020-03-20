@@ -16,8 +16,8 @@ export class Project extends Model<Project> {
     @Column(DataType.STRING)
     description: string;
 
-    @HasMany(() => Task, { foreignKey: 'projectId', sourceKey: 'id' })
-    tasks: Array<Task>;
+    // @HasMany(() => Task, { foreignKey: 'projectId', sourceKey: 'id' })
+    // tasks: Array<Task>;
 
     @BelongsToMany(() => User, () => UserProject)
     users: Array<User>;

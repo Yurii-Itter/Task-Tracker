@@ -1,7 +1,4 @@
-import { Table, Column, Model, PrimaryKey, DataType, HasOne } from 'sequelize-typescript';
-
-import { Project } from './project.model';
-import { User } from './user.model';
+import { Table, Column, Model, PrimaryKey, DataType } from 'sequelize-typescript';
 
 @Table({ timestamps: false })
 export class Task extends Model<Task> {
@@ -29,10 +26,4 @@ export class Task extends Model<Task> {
 
     @Column(DataType.INTEGER)
     projectId: number;
-
-    @HasOne(() => User, { foreignKey: 'id', sourceKey: 'userId' })
-    user: User;
-
-    @HasOne(() => Project, { foreignKey: 'id', sourceKey: 'projectId' })
-    project: Project;
 }

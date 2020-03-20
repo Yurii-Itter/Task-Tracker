@@ -21,7 +21,7 @@ export class User extends Model<User> {
     roleId: number;
 
     @HasOne(() => Role, { foreignKey: 'id', sourceKey: 'roleId' })
-    role: string;
+    role: Role;
 
     @HasMany(() => Task, { foreignKey: 'userId', sourceKey: 'id' })
     tasks: Array<Task>;
