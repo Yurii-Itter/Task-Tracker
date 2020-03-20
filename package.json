@@ -2,8 +2,12 @@
   "name": "team-task-tracker",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Yurii Itter",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Yurii-Itter/Team-Task-Tracker-Back-End.git"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
