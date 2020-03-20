@@ -12,18 +12,9 @@ export class Task extends Model<Task> {
     @Column(DataType.STRING)
     description: string;
 
-    @Column(DataType.BOOLEAN)
-    active: boolean;
-
-    @Column(DataType.BOOLEAN)
-    review: boolean;
-
-    @Column(DataType.BOOLEAN)
-    finished: boolean;
+    @Column(DataType.STRING)
+    status: string;
 
     @Column(DataType.INTEGER)
     userId: number;
-
-    @Column(DataType.INTEGER)
-    projectId: number;
 }
