@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 
 import { databaseProviders } from './database.providers';
 
-import { DatabaseService } from './database.service';
+import { UserService } from './user.service';
+import { TaskService } from './task.service';
 
 import { CommonModule } from '../common/common.module';
 
 @Module({
     imports: [CommonModule],
-    providers: [...databaseProviders, DatabaseService],
-    exports: [...databaseProviders, DatabaseService]
+    providers: [...databaseProviders, UserService, TaskService],
+    exports: [UserService, TaskService]
 })
 export class DatabaseModule { }

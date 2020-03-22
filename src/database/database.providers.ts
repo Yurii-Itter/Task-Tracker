@@ -19,7 +19,7 @@ export const databaseProviders = [
                 password: configService.get('DATABASE_PASSWORD'),
             });
             sequelize.addModels([Task, User]);
-            await sequelize.sync({ force: true });
+            await sequelize.sync();
             return sequelize;
         },
         inject: [ConfigService]

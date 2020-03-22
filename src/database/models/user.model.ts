@@ -1,10 +1,11 @@
-import { Table, Column, Model, PrimaryKey, DataType, HasMany, HasOne, BelongsToMany } from 'sequelize-typescript';
+import { Table, Column, Model, PrimaryKey, DataType, AutoIncrement, HasMany } from 'sequelize-typescript';
 
 import { Task } from './task.model';
 
 @Table({ timestamps: false })
 export class User extends Model<User> {
     @PrimaryKey
+    @AutoIncrement
     @Column(DataType.INTEGER)
     id: number;
 
@@ -14,6 +15,6 @@ export class User extends Model<User> {
     @Column(DataType.STRING)
     lastName: string;
 
-    @HasMany(() => Task, { foreignKey: 'userId', sourceKey: 'id' })
-    tasks: Array<Task>;
+    @HasMany(() => Task)
+    tasks: Array<Task>
 }
