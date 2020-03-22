@@ -1,12 +1,10 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 
-import { User } from './models/user.model';
-import { Task } from './models/task.model';
+import { User } from '../database/models/user.model';
+import { Task } from '../database/models/task.model';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
-import { Error } from './interfaces/error.interface';
 
 @Injectable()
 export class UserService {
@@ -15,48 +13,44 @@ export class UserService {
         @Inject(Logger) private readonly logger: Logger
     ) { }
 
-    public async getAll(): Promise<Array<User> | Error> {
+    public async getAll(): Promise<Array<User>> {
         try {
             return this.usersRepository.findAll({ include: [Task] });
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 
-    public async get(id: number): Promise<User | Error> {
+    public async get(id: number): Promise<User> {
         try {
             return this.usersRepository.findOne({ where: { id }, include: [Task] });
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 
-    public async create({ firstName, lastName }: CreateUserDto): Promise<User | Error> {
+    public async create({ firstName, lastName }: CreateUserDto): Promise<User> {
         try {
             return this.usersRepository.create({ firstName, lastName });
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 
-    public async update({ id, firstName, lastName }: UpdateUserDto): Promise<any | Error> {
+    public async update({ id, firstName, lastName }: UpdateUserDto): Promise<any> {
         try {
             return this.usersRepository.update({ firstName, lastName }, { where: { id } });
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 
-    public async delete(id: number): Promise<number | Error> {
+    public async delete(id: number): Promise<number> {
         try {
+            (await this.get(id)).tasks.forEach((task: Task) => task.userId = null);
             return this.usersRepository.destroy({ where: { id } });
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 }

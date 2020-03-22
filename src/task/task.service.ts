@@ -1,16 +1,14 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 
-import { Task } from './models/task.model';
-import { User } from './models/user.model';
+import { Task } from '../database/models/task.model';
+import { User } from '../database/models/user.model';
 
-import { UserService } from './user.service';
+import { UserService } from '../user/user.service';
 
 import { CreateTaskDto } from './dto/create-task.dto';
 import { SetTaskStatusDto } from './dto/set-task-status.dto';
 import { SetTaskUserDto } from './dto/set-task-user.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-
-import { Error } from './interfaces/error.interface';
 
 @Injectable()
 export class TaskService {
@@ -20,16 +18,24 @@ export class TaskService {
         @Inject(Logger) private readonly logger: Logger
     ) { }
 
-    public async getAll(filter?: string): Promise<Array<Task> | Error> {
+    public async getAll(status?: string): Promise<Array<Task>> {
         try {
-            return this.tasksRepository.findAll({ include: [User] });
+            if (status === 'todo') {
+                return this.tasksRepository.findAll({ where: { status: 'To Do' }, order: [['id', 'ASC']], include: [User] });
+            } else if (status === 'inprogress') {
+                return this.tasksRepository.findAll({ where: { status: 'In Progress' }, order: [['id', 'ASC']], include: [User] });
+            } else if (status === 'done') {
+                return this.tasksRepository.findAll({ where: { status: 'Done' }, order: [['id', 'ASC']], include: [User] });
+            } else {
+                return this.tasksRepository.findAll({ order: [['id', 'ASC']], include: [User] });
+            }
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 
-    public async create({ title, description, userId }: CreateTaskDto): Promise<Task | Error> {
+    // Flag
+    public async create({ title, description, userId }: CreateTaskDto): Promise<Task> {
         try {
             if (userId && this.usersService.get(userId)) {
                 return this.tasksRepository.create({ title, description, status: "To Do", userId });
@@ -38,29 +44,26 @@ export class TaskService {
             }
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 
-    public async update({ id, title, description }: UpdateTaskDto): Promise<any | Error> {
+    public async update({ id, title, description }: UpdateTaskDto): Promise<any> {
         try {
             return this.tasksRepository.update({ title, description }, { where: { id } });
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 
-    public async setStatus({ id, status }: SetTaskStatusDto): Promise<any | Error> {
+    public async setStatus({ id, status }: SetTaskStatusDto): Promise<any> {
         try {
             return this.tasksRepository.update({ status }, { where: { id } });
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 
-    public async setUser({ id, userId }: SetTaskUserDto): Promise<any | Error> {
+    public async setUser({ id, userId }: SetTaskUserDto): Promise<any> {
         try {
             if (this.usersService.get(userId)) {
                 return this.tasksRepository.update({ userId }, { where: { id } });
@@ -69,16 +72,14 @@ export class TaskService {
             }
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 
-    public async delete(id: number): Promise<any | Error> {
+    public async delete(id: number): Promise<any> {
         try {
             return this.tasksRepository.destroy({ where: { id } });
         } catch (error) {
             this.logger.error(error);
-            return { error };
         }
     }
 }
