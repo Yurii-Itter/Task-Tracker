@@ -1,3 +1,10 @@
+## Approximate requirements
+
+```bash
+node.js v12+-
+npm v6+-
+```
+
 ## Installation
 
 ```bash
