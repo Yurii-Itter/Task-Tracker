@@ -1,6 +1,7 @@
 ## Installation
 
 ```bash
+$ git clone https://github.com/Yurii-Itter/Task-Tracker.git
 $ npm install
 ```
 
