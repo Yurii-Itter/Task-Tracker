@@ -10,6 +10,8 @@ import { SetTaskStatusDto } from './dto/set-task-status.dto';
 import { SetTaskUserDto } from './dto/set-task-user.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
+import { ResponseInterface } from '../common/interfaces/response.interface';
+
 @Injectable()
 export class TaskService {
     constructor(
@@ -18,68 +20,106 @@ export class TaskService {
         @Inject(Logger) private readonly logger: Logger
     ) { }
 
-    public async getAll(status?: string): Promise<Array<Task>> {
+    public async get(id: number): Promise<ResponseInterface> {
         try {
+            const data = await this.tasksRepository.findOne({ where: { id }, include: [User] });
+            return { status: 'success', data };
+        } catch (error) {
+            this.logger.error(error);
+            return { status: 'failure', message: error };
+        }
+    }
+
+    public async getAll(status?: string): Promise<ResponseInterface> {
+        try {
+            let data: any;
             if (status === 'todo') {
-                return this.tasksRepository.findAll({ where: { status: 'To Do' }, order: [['id', 'ASC']], include: [User] });
+                data = await this.tasksRepository.findAll({ where: { status: 'To Do' }, order: [['id', 'ASC']], include: [User] });
             } else if (status === 'inprogress') {
-                return this.tasksRepository.findAll({ where: { status: 'In Progress' }, order: [['id', 'ASC']], include: [User] });
+                data = await this.tasksRepository.findAll({ where: { status: 'In Progress' }, order: [['id', 'ASC']], include: [User] });
             } else if (status === 'done') {
-                return this.tasksRepository.findAll({ where: { status: 'Done' }, order: [['id', 'ASC']], include: [User] });
+                data = await this.tasksRepository.findAll({ where: { status: 'Done' }, order: [['id', 'ASC']], include: [User] });
             } else {
-                return this.tasksRepository.findAll({ order: [['id', 'ASC']], include: [User] });
+                data = await this.tasksRepository.findAll({ order: [['id', 'ASC']], include: [User] });
+            }
+            return { status: 'success', data: JSON.stringify(data) };
+        } catch (error) {
+            this.logger.error(error);
+            return { status: 'failure', message: error };
+        }
+    }
+
+    public async create({ title, description, userId }: CreateTaskDto): Promise<ResponseInterface> {
+        try {
+            if (userId && (await this.usersService.get(userId)).data) {
+                await this.tasksRepository.create({ title, description, status: "To Do", userId });
+            } else {
+                await this.tasksRepository.create({ title, description, status: "To Do" });
+            }
+            return { status: 'success' };
+        } catch (error) {
+            this.logger.error(error);
+            return { status: 'failure', message: error };
+        }
+    }
+
+    public async update({ id, title, description }: UpdateTaskDto): Promise<ResponseInterface> {
+        try {
+            if ((await this.get(id)).data) {
+                await this.tasksRepository.update({ title, description }, { where: { id } });
+                return { status: 'success' };
+            } else {
+                return { status: 'failure', message: `There is no task with id ${id}` };
             }
         } catch (error) {
             this.logger.error(error);
+            return { status: 'failure', message: error };
         }
     }
 
-    // Flag
-    public async create({ title, description, userId }: CreateTaskDto): Promise<Task> {
+    public async setStatus({ id, status }: SetTaskStatusDto): Promise<ResponseInterface> {
         try {
-            if (userId && this.usersService.get(userId)) {
-                return this.tasksRepository.create({ title, description, status: "To Do", userId });
+            if ((await this.get(id)).data) {
+                await this.tasksRepository.update({ status }, { where: { id } });
+                return { status: 'success' };
             } else {
-                return this.tasksRepository.create({ title, description, status: "To Do" });
+                return { status: 'failure', message: `There is no task with id ${id}` };
             }
         } catch (error) {
             this.logger.error(error);
+            return { status: 'failure', message: error };
         }
     }
 
-    public async update({ id, title, description }: UpdateTaskDto): Promise<any> {
+    public async setUser({ id, userId }: SetTaskUserDto): Promise<ResponseInterface> {
         try {
-            return this.tasksRepository.update({ title, description }, { where: { id } });
-        } catch (error) {
-            this.logger.error(error);
-        }
-    }
-
-    public async setStatus({ id, status }: SetTaskStatusDto): Promise<any> {
-        try {
-            return this.tasksRepository.update({ status }, { where: { id } });
-        } catch (error) {
-            this.logger.error(error);
-        }
-    }
-
-    public async setUser({ id, userId }: SetTaskUserDto): Promise<any> {
-        try {
-            if (this.usersService.get(userId)) {
-                return this.tasksRepository.update({ userId }, { where: { id } });
+            if ((await this.usersService.get(userId)).data && (await this.get(id)).data) {
+                await this.tasksRepository.update({ userId }, { where: { id } });
+                return { status: 'success' };
             } else {
-                return { error: 'User is invalid' };
+                if (!(await this.usersService.get(userId)).data) {
+                    return { status: 'failure', message: `There is no user with id ${userId}` };
+                } else if (!(await this.get(id)).data) {
+                    return { status: 'failure', message: `There is no task with id ${id}` };
+                }
             }
         } catch (error) {
             this.logger.error(error);
+            return { status: 'failure', message: error };
         }
     }
 
-    public async delete(id: number): Promise<any> {
+    public async delete(id: number): Promise<ResponseInterface> {
         try {
-            return this.tasksRepository.destroy({ where: { id } });
+            if ((await this.get(id)).data) {
+                await this.tasksRepository.destroy({ where: { id } });
+                return { status: 'success' };
+            } else {
+                return { status: 'failure', message: `There is no task with id ${id}` };
+            }
         } catch (error) {
             this.logger.error(error);
+            return { status: 'failure', message: error };
         }
     }
 }

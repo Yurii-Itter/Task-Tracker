@@ -6,7 +6,7 @@ export class UpdateTaskDto {
     id: number;
 
     @IsNotEmpty()
-    @IsNumber()
+    @IsString()
     title: string;
 
     @IsNotEmpty()

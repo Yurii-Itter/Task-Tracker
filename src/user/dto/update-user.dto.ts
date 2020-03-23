@@ -10,6 +10,6 @@ export class UpdateUserDto {
     firstName: string;
 
     @IsNotEmpty()
-    @IsNumber()
+    @IsString()
     lastName: string;
 }
