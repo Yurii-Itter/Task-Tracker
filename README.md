@@ -23,5 +23,6 @@ DATABASE_PASSWORD=YOUR_DATABASE_PASSWORD
 ## Running the app
 
 ```bash
+$ npm run build
 $ npm run start:prod
 ```
