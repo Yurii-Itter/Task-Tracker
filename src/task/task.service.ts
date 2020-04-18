@@ -42,7 +42,7 @@ export class TaskService {
             } else {
                 data = await this.tasksRepository.findAll({ order: [['id', 'ASC']], include: [User] });
             }
-            return { status: 'success', data: JSON.stringify(data) };
+            return { status: 'success', data };
         } catch (error) {
             this.logger.error(error);
             return { status: 'failure', message: error };

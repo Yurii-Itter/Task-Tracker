@@ -29,7 +29,7 @@ export class UserService {
     public async getAll(): Promise<ResponseInterface> {
         try {
             const data = await this.usersRepository.findAll({ include: [Task] });
-            return { status: 'success', data: JSON.stringify(data) };
+            return { status: 'success', data };
         } catch (error) {
             this.logger.error(error);
             return { status: 'failure', message: error };
